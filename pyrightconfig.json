@@ -1,0 +1,9 @@
+{
+  "//": "Geekatplay Studio - ComfyUI custom node packages are loaded by file path, not by import name (see ComfyUI's nodes.py load_custom_node), so the folder name is allowed to contain hyphens. A hyphen is not a legal Python identifier, so static checkers cannot name this package and report every relative import inside it as unresolved. That is a naming artifact, not a defect - the imports work at runtime. ComfyUI itself is not on the checker's path either.",
+  "extraPaths": [".", "../..", "../../comfy", "../../comfy_extras"],
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none",
+  "reportAttributeAccessIssue": "warning",
+  "typeCheckingMode": "basic",
+  "exclude": ["**/__pycache__", "workflows"]
+}

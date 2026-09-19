@@ -1,0 +1,19 @@
+# Geekatplay Studio - ComfyUI custom node package.
+#
+# ComfyUI loads custom nodes by file path (importlib.util.spec_from_file_location in
+# nodes.py), never by import name, so the folder is allowed to contain hyphens. A hyphen
+# is not a legal Python identifier, so a static checker cannot name this package and
+# reports every relative import inside it - `from .gap_render_core import ...` - as
+# unresolved. That is a naming artifact, not a defect: the imports work at runtime.
+#
+# ComfyUI's own modules (comfy, comfy_api, comfy_extras, folder_paths, nodes,
+# node_helpers) are also only importable once ComfyUI is running, so they are unresolved
+# here for the same kind of reason.
+
+[environment]
+root = ["."]
+extra-paths = ["../..", "../../comfy", "../../comfy_extras"]
+
+[rules]
+unresolved-import = "ignore"
+unresolved-attribute = "warn"

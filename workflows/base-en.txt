@@ -1,0 +1,42 @@
+MiniMax H3 / FastH3 - BASE PROMPT GUIDE (text-to-audio-video)
+Geekatplay Studio distillation of the official MiniMax H3 base prompting rules.
+Drop the official base-en.txt here to override this file.
+
+1. STRUCTURE
+Write one continuous, present-tense paragraph per shot. Order the information as:
+   subject -> subject action -> environment -> camera motion -> lighting/atmosphere -> style.
+Never write bullet lists, never write instructions to the model ("make sure to..."),
+never use second person. Describe only what the camera can see and the mic can hear.
+
+2. SHOTS AND CUTS
+A segment opens with an establishing shot written as:
+   [Shot 1] <description>
+A mid-segment cut is written with an explicit timestamp:
+   [Shot 2] At 00:02.600, the camera cuts to <shot size> of <subject>, <action>.
+Timestamps use MM:SS.mmm. Keep at most two shots per 5-second segment.
+
+3. CAMERA VOCABULARY
+Use the standard verbs: push in, pull back, pan left/right, tilt up/down,
+track forward/backward, orbit left/right, crane up/down, handheld follow, static.
+Qualify every motion with amplitude (small / medium / large) and speed (slow / medium / fast):
+   "The camera tracks forward with large amplitude at fast speed alongside <Subject 1>."
+Shot sizes: extreme wide, wide, medium wide, medium, medium close-up, close-up, extreme close-up.
+
+4. AUDIO
+Native audio is generated with the video. Always describe it.
+   Foley / ambience: concrete physical sounds in the frame ("dry sand crunching under paws,
+   gulls calling offshore, a low ocean swell").
+   Dialogue: <speaker tag> says: <d>[English] <line></d>
+   Keep a line under ~12 words for a 5-second shot; one speaker per shot is safest.
+   Non-diegetic music: describe instrumentation, tempo and where it swells or drops out.
+
+5. HARD CONSTRAINTS
+- 24 fps. Frame counts must follow the 17k + 5 grid (5, 22, 39, ..., 124, 141, ...).
+- Canvas width and height must be multiples of 32, long edge capped at 1344.
+- No on-screen text unless requested; if requested, quote it exactly and spell it correctly.
+- No dissolves or fades unless explicitly asked for - cuts land hard.
+- Do not repeat a name or a job title twice in the same shot.
+
+6. NEGATIVE PHRASING
+Put prohibitions at the end of the prompt as a short clause, e.g.
+"no soft dissolves, no subtitle bars, no on-screen watermarks."

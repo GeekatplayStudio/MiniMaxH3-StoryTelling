@@ -1,0 +1,1360 @@
+{
+  "id": "2b5d7e91-4a6c-4f83-9d21-6c8e0f4a7b13",
+  "revision": 0,
+  "last_node_id": 84,
+  "last_link_id": 20,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "MarkdownNote",
+      "pos": [
+        -2180,
+        -260
+      ],
+      "size": [
+        460,
+        620
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "README - Keyframe Chain",
+      "color": "#432",
+      "bgcolor": "#653",
+      "properties": {},
+      "widgets_values": [
+        "## Keyframe Chain - MiniMax FastH3\n**Geekatplay Studio - Vladimir Chopine**\nhttps://www.geekatplay.com\n\n### The chain\nEach image is the **closing** frame of one segment and the **opening** frame of the next:\n\n| segment | first frame | last frame |\n|---|---|---|\n| 1 | image 1 | image 2 |\n| 2 | image 2 | image 3 |\n| 3 | image 3 | image 4 |\n| 4 | image 4 | *none - tail* |\n\nThe tail segment is image-to-video with no closing frame, so the movie does not end on a\nfreeze. Turn `tail_segment` off on the manager if you want it to stop on the last image.\n\n### The prompt is FORMATTED, not written\n`prompt_mode` defaults to **format my text only (no AI, no invention)**. It rewrites what you\ntype into MiniMax H3 motion grammar and adds nothing - no model is called, so it cannot\nhallucinate:\n\nYour sentence is split into a scene part and a camera part. The scene part is kept\n**word for word**; only the camera part is restated in the documented grammar.\n\n| you type | it sends |\n|---|---|\n| `the girl dancing in the enchanted forest and camera orbiting around her` | `[Shot 1] the girl dancing in the enchanted forest. The camera orbits with medium amplitude at medium speed.` |\n| `slow pan right` | `[Shot 1] The camera pans right with medium amplitude at slow speed.` |\n| `wide shot of mountains at dawn` | `[Shot 1] wide shot of mountains at dawn.` |\n| `hold still` | `[Shot 1] The camera holds static.` |\n\nNothing is dropped and nothing is added. If no camera wording is recognised the sentence\npasses through untouched. `prompt_preview` reports exactly what was done.\n\n`style_mode` on the manager defaults to **none - send only my prompt**, so no look\ninstruction is appended either. `closing_frame_note` is off for the same reason.\n\nThe other modes: **format with Ollama (strict)** uses the LLM but throws its answer away if\nit introduces any word you never wrote; **expand creatively** lets it write freely.\n\n### IMPORTANT: describe motion, not content\nThis is image-to-video. Your pictures already decide what is in frame, how it is framed and\nwhat it looks like. The description on each Keyframe Input should say only how things MOVE.\n\nDo not write a shot size (\"medium shot\", \"over-the-shoulder\") and do not write \"the subject\" -\nan over-the-shoulder shot means a shot of a person, so asking for one over a landscape makes\nthe model invent a person.\n\n`style_mode` on the manager defaults to **follow the supplied frames**, which tells the model\nto keep your images' look and add nothing. Use `full style lock` only when you deliberately\nwant the render to depart from the source frames.\n\n### Seeing what the AI wrote\nEvery Segment Generator's **`prompt_preview`** goes to its own preview node, and the manager's\n**`segment_prompts`** shows the FINAL text sent to MiniMax H3 for each segment - including\nwhich keyframe was anchored as the first frame, which as the last, and at what frame index.\n\n### Adding or removing keyframes\nThe Segment Manager grows its own inputs. Fill `segment_4` and a `segment_5` slot appears;\ndisconnect one and the empty slot goes away. Up to 12. Order matters - slot order **is**\nstory order.\n\nTo add a keyframe: copy a LoadImage + Keyframe Input + Segment Generator group, and drop its\n`segment` output onto the manager's empty slot.\n"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "MarkdownNote",
+      "pos": [
+        -2180,
+        400
+      ],
+      "size": [
+        460,
+        700
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Segment length, style & music",
+      "color": "#432",
+      "bgcolor": "#653",
+      "properties": {},
+      "widgets_values": [
+        "## Segment length\n\nEach **Segment Generator** reads its description and picks **3s to 10s** on its own:\n\n- a held portrait scores low and lands near 3s\n- running, leaping, transforming, several beats in one sentence, or a spoken line all push\n  it up toward 10s\n\nOverride it three ways, in order of priority:\n\n1. `duration_override` on a **Keyframe Input** (0 = off) - that one segment only\n2. `duration_mode: fixed` on a **Segment Generator** - that one segment\n3. `duration_source` on the **Segment Manager** - all segments at once\n   (`manager override` forces its value, `clamp` only shortens)\n\nEvery length is snapped to MiniMax H3's 17k+5 frame grid at 24 fps, so 5.0s becomes 5.17s\n(124 frames). The generator reports what it picked on its `prompt_preview` output.\n\n## Screen shape and screen size\n`aspect_ratio` sets the SHAPE (`match first keyframe` copies the first image's proportions).\n`frame_size` sets the SIZE - how many pixels that shape is rendered at:\n\n| frame_size | 16:9 | 9:16 |\n|---|---|---|\n| auto / 1344 | 1344x768 | 768x1344 |\n| 1024 long edge | 1024x576 | 576x1024 |\n| 768 long edge | 768x448 | 448x768 |\n| 640 long edge | 640x352 | 352x640 |\n\nSmaller is much faster to render. Both axes snap to 32 and the area is capped to what\nMiniMax H3 supports, so no combination can produce an invalid canvas.\n\n## Style lives on the manager\nThe generators write only what MOVES. The manager stamps the same style, mood and video-type\nclause onto every segment, so the look cannot drift between shots.\n\n## Music\n`LoadAudio` is bypassed (ctrl+B). Un-bypass it to add a bed, then pick a `music_mix_mode`.\n\n## Lipsync (experimental)\nConnect speech to `lipsync_audio_0`, `lipsync_audio_1`... to drive the matching segment.\nSee the README before relying on it.\n"
+      ]
+    },
+    {
+      "id": 10,
+      "type": "LoadImage",
+      "pos": [
+        -1680,
+        -240
+      ],
+      "size": [
+        340,
+        314
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            1
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "title": "Keyframe 1 image",
+      "properties": {
+        "Node name for S&R": "LoadImage",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": [
+        "example.png",
+        "image"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "GAPKeyframeInput",
+      "pos": [
+        -1300,
+        -240
+      ],
+      "size": [
+        400,
+        330
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "keyframe",
+          "type": "GAP_KEYFRAME",
+          "links": [
+            2
+          ]
+        }
+      ],
+      "title": "Keyframe 1 - image + description",
+      "properties": {
+        "Node name for S&R": "GAPKeyframeInput",
+        "cnr_id": "comfyui-geekatplay-storyteller",
+        "ver": "1.1.0"
+      },
+      "widgets_values": [
+        "The camera drifts slowly forward as the light shifts.",
+        "",
+        "",
+        0.0,
+        ""
+      ]
+    },
+    {
+      "id": 30,
+      "type": "GAPSegmentGenerator",
+      "pos": [
+        -860,
+        -240
+      ],
+      "size": [
+        400,
+        360
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "keyframe",
+          "type": "GAP_KEYFRAME",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "segment",
+          "type": "GAP_SEGMENT",
+          "links": [
+            3
+          ]
+        },
+        {
+          "name": "prompt_preview",
+          "type": "STRING",
+          "links": [
+            4
+          ]
+        },
+        {
+          "name": "duration",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "frame_length",
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "title": "Segment Generator 1",
+      "properties": {
+        "Node name for S&R": "GAPSegmentGenerator",
+        "cnr_id": "comfyui-geekatplay-storyteller",
+        "ver": "1.1.0"
+      },
+      "widgets_values": [
+        "format my text only (no AI, no invention)",
+        "auto (from scene complexity)",
+        3.0,
+        10.0,
+        5.0,
+        false,
+        false,
+        false,
+        true,
+        "http://127.0.0.1:11434",
+        "qwen3:8b",
+        "",
+        true,
+        true,
+        42,
+        "fixed"
+      ]
+    },
+    {
+      "id": 80,
+      "type": "PreviewAny",
+      "pos": [
+        -420,
+        -240
+      ],
+      "size": [
+        420,
+        260
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "Prompt written for keyframe 1",
+      "properties": {
+        "Node name for S&R": "PreviewAny",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 11,
+      "type": "LoadImage",
+      "pos": [
+        -1680,
+        190
+      ],
+      "size": [
+        340,
+        314
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            5
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "title": "Keyframe 2 image",
+      "properties": {
+        "Node name for S&R": "LoadImage",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": [
+        "example.png",
+        "image"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "GAPKeyframeInput",
+      "pos": [
+        -1300,
+        190
+      ],
+      "size": [
+        400,
+        330
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "keyframe",
+          "type": "GAP_KEYFRAME",
+          "links": [
+            6
+          ]
+        }
+      ],
+      "title": "Keyframe 2 - image + description",
+      "properties": {
+        "Node name for S&R": "GAPKeyframeInput",
+        "cnr_id": "comfyui-geekatplay-storyteller",
+        "ver": "1.1.0"
+      },
+      "widgets_values": [
+        "The camera pans right and the scene settles.",
+        "",
+        "slow pan right",
+        0.0,
+        ""
+      ]
+    },
+    {
+      "id": 31,
+      "type": "GAPSegmentGenerator",
+      "pos": [
+        -860,
+        190
+      ],
+      "size": [
+        400,
+        360
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "keyframe",
+          "type": "GAP_KEYFRAME",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "segment",
+          "type": "GAP_SEGMENT",
+          "links": [
+            7
+          ]
+        },
+        {
+          "name": "prompt_preview",
+          "type": "STRING",
+          "links": [
+            8
+          ]
+        },
+        {
+          "name": "duration",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "frame_length",
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "title": "Segment Generator 2",
+      "properties": {
+        "Node name for S&R": "GAPSegmentGenerator",
+        "cnr_id": "comfyui-geekatplay-storyteller",
+        "ver": "1.1.0"
+      },
+      "widgets_values": [
+        "format my text only (no AI, no invention)",
+        "auto (from scene complexity)",
+        3.0,
+        10.0,
+        5.0,
+        false,
+        false,
+        false,
+        true,
+        "http://127.0.0.1:11434",
+        "qwen3:8b",
+        "",
+        true,
+        true,
+        43,
+        "fixed"
+      ]
+    },
+    {
+      "id": 81,
+      "type": "PreviewAny",
+      "pos": [
+        -420,
+        190
+      ],
+      "size": [
+        420,
+        260
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "Prompt written for keyframe 2",
+      "properties": {
+        "Node name for S&R": "PreviewAny",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 12,
+      "type": "LoadImage",
+      "pos": [
+        -1680,
+        620
+      ],
+      "size": [
+        340,
+        314
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            9
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "title": "Keyframe 3 image",
+      "properties": {
+        "Node name for S&R": "LoadImage",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": [
+        "example.png",
+        "image"
+      ]
+    },
+    {
+      "id": 22,
+      "type": "GAPKeyframeInput",
+      "pos": [
+        -1300,
+        620
+      ],
+      "size": [
+        400,
+        330
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "keyframe",
+          "type": "GAP_KEYFRAME",
+          "links": [
+            10
+          ]
+        }
+      ],
+      "title": "Keyframe 3 - image + description",
+      "properties": {
+        "Node name for S&R": "GAPKeyframeInput",
+        "cnr_id": "comfyui-geekatplay-storyteller",
+        "ver": "1.1.0"
+      },
+      "widgets_values": [
+        "The camera pushes in gently.",
+        "",
+        "",
+        0.0,
+        ""
+      ]
+    },
+    {
+      "id": 32,
+      "type": "GAPSegmentGenerator",
+      "pos": [
+        -860,
+        620
+      ],
+      "size": [
+        400,
+        360
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "keyframe",
+          "type": "GAP_KEYFRAME",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "segment",
+          "type": "GAP_SEGMENT",
+          "links": [
+            11
+          ]
+        },
+        {
+          "name": "prompt_preview",
+          "type": "STRING",
+          "links": [
+            12
+          ]
+        },
+        {
+          "name": "duration",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "frame_length",
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "title": "Segment Generator 3",
+      "properties": {
+        "Node name for S&R": "GAPSegmentGenerator",
+        "cnr_id": "comfyui-geekatplay-storyteller",
+        "ver": "1.1.0"
+      },
+      "widgets_values": [
+        "format my text only (no AI, no invention)",
+        "auto (from scene complexity)",
+        3.0,
+        10.0,
+        5.0,
+        false,
+        false,
+        false,
+        true,
+        "http://127.0.0.1:11434",
+        "qwen3:8b",
+        "",
+        true,
+        true,
+        44,
+        "fixed"
+      ]
+    },
+    {
+      "id": 82,
+      "type": "PreviewAny",
+      "pos": [
+        -420,
+        620
+      ],
+      "size": [
+        420,
+        260
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "Prompt written for keyframe 3",
+      "properties": {
+        "Node name for S&R": "PreviewAny",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 13,
+      "type": "LoadImage",
+      "pos": [
+        -1680,
+        1050
+      ],
+      "size": [
+        340,
+        314
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            13
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "title": "Keyframe 4 image",
+      "properties": {
+        "Node name for S&R": "LoadImage",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": [
+        "example.png",
+        "image"
+      ]
+    },
+    {
+      "id": 23,
+      "type": "GAPKeyframeInput",
+      "pos": [
+        -1300,
+        1050
+      ],
+      "size": [
+        400,
+        330
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "keyframe",
+          "type": "GAP_KEYFRAME",
+          "links": [
+            14
+          ]
+        }
+      ],
+      "title": "Keyframe 4 - image + description",
+      "properties": {
+        "Node name for S&R": "GAPKeyframeInput",
+        "cnr_id": "comfyui-geekatplay-storyteller",
+        "ver": "1.1.0"
+      },
+      "widgets_values": [
+        "The camera pulls back and comes to rest.",
+        "",
+        "",
+        0.0,
+        ""
+      ]
+    },
+    {
+      "id": 33,
+      "type": "GAPSegmentGenerator",
+      "pos": [
+        -860,
+        1050
+      ],
+      "size": [
+        400,
+        360
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "keyframe",
+          "type": "GAP_KEYFRAME",
+          "link": 14
+        }
+      ],
+      "outputs": [
+        {
+          "name": "segment",
+          "type": "GAP_SEGMENT",
+          "links": [
+            15
+          ]
+        },
+        {
+          "name": "prompt_preview",
+          "type": "STRING",
+          "links": [
+            16
+          ]
+        },
+        {
+          "name": "duration",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "frame_length",
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "title": "Segment Generator 4",
+      "properties": {
+        "Node name for S&R": "GAPSegmentGenerator",
+        "cnr_id": "comfyui-geekatplay-storyteller",
+        "ver": "1.1.0"
+      },
+      "widgets_values": [
+        "format my text only (no AI, no invention)",
+        "auto (from scene complexity)",
+        3.0,
+        10.0,
+        5.0,
+        false,
+        false,
+        false,
+        true,
+        "http://127.0.0.1:11434",
+        "qwen3:8b",
+        "",
+        true,
+        true,
+        45,
+        "fixed"
+      ]
+    },
+    {
+      "id": 83,
+      "type": "PreviewAny",
+      "pos": [
+        -420,
+        1050
+      ],
+      "size": [
+        420,
+        260
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 16
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "Prompt written for keyframe 4",
+      "properties": {
+        "Node name for S&R": "PreviewAny",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 70,
+      "type": "LoadAudio",
+      "pos": [
+        -860,
+        1520
+      ],
+      "size": [
+        400,
+        136
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            17
+          ]
+        }
+      ],
+      "title": "Background music (bypassed - ctrl+B to enable)",
+      "properties": {
+        "Node name for S&R": "LoadAudio",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 40,
+      "type": "GAPSegmentManager",
+      "pos": [
+        120,
+        -240
+      ],
+      "size": [
+        460,
+        900
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "segment_0",
+          "name": "segments.segment_0",
+          "shape": 7,
+          "type": "GAP_SEGMENT",
+          "link": 3
+        },
+        {
+          "label": "segment_1",
+          "name": "segments.segment_1",
+          "shape": 7,
+          "type": "GAP_SEGMENT",
+          "link": 7
+        },
+        {
+          "label": "segment_2",
+          "name": "segments.segment_2",
+          "shape": 7,
+          "type": "GAP_SEGMENT",
+          "link": 11
+        },
+        {
+          "label": "segment_3",
+          "name": "segments.segment_3",
+          "shape": 7,
+          "type": "GAP_SEGMENT",
+          "link": 15
+        },
+        {
+          "label": "segment_4",
+          "name": "segments.segment_4",
+          "shape": 7,
+          "type": "GAP_SEGMENT",
+          "link": null
+        },
+        {
+          "label": "lipsync_audio_0",
+          "name": "lipsync_audios.lipsync_audio_0",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "name": "background_music",
+          "type": "AUDIO",
+          "shape": 7,
+          "link": 17
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            18
+          ]
+        },
+        {
+          "name": "frames",
+          "type": "IMAGE",
+          "links": null
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": null
+        },
+        {
+          "name": "segment_paths",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "chain_report",
+          "type": "STRING",
+          "links": [
+            19
+          ]
+        },
+        {
+          "name": "segment_prompts",
+          "type": "STRING",
+          "links": [
+            20
+          ]
+        }
+      ],
+      "title": "Segment Manager - Keyframe Chain",
+      "color": "#233",
+      "bgcolor": "#355",
+      "properties": {
+        "Node name for S&R": "GAPSegmentManager",
+        "cnr_id": "comfyui-geekatplay-storyteller",
+        "ver": "1.1.0"
+      },
+      "widgets_values": [
+        "Cinematic Live-Action",
+        "Narrative Scene",
+        "Calm & Atmospheric",
+        "none - send only my prompt (recommended)",
+        "match first keyframe",
+        "auto (MiniMax H3 native, ~1 MP)",
+        1344,
+        768,
+        "from segment generator",
+        5.0,
+        true,
+        "fastvideo_fasth3_8step_v2_pruned_int8_convrot.safetensors",
+        "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+        "minimax_h3_video_vae_fp16.safetensors",
+        "minimax_h3_audio_vae_fp32.safetensors",
+        8,
+        "euler",
+        "simple",
+        10.0,
+        3.0,
+        835698757605547,
+        "fixed",
+        "blend with video audio",
+        0.35,
+        1.0,
+        true,
+        true,
+        true,
+        "storyteller/KeyframeChain",
+        true,
+        "",
+        true
+      ]
+    },
+    {
+      "id": 50,
+      "type": "SaveVideo",
+      "pos": [
+        640,
+        -240
+      ],
+      "size": [
+        440,
+        440
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 18
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SaveVideo",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": [
+        "video/KeyframeChain_MiniMaxH3",
+        "auto",
+        "auto",
+        "auto"
+      ]
+    },
+    {
+      "id": 60,
+      "type": "PreviewAny",
+      "pos": [
+        640,
+        240
+      ],
+      "size": [
+        440,
+        300
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "Chain report",
+      "properties": {
+        "Node name for S&R": "PreviewAny",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 61,
+      "type": "PreviewAny",
+      "pos": [
+        640,
+        620
+      ],
+      "size": [
+        520,
+        640
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 20
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "title": "EXACT prompt sent per segment (+ which frames were anchored)",
+      "color": "#233",
+      "bgcolor": "#355",
+      "properties": {
+        "Node name for S&R": "PreviewAny",
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0"
+      },
+      "widgets_values": []
+    }
+  ],
+  "links": [
+    [
+      1,
+      10,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      2,
+      20,
+      0,
+      30,
+      0,
+      "GAP_KEYFRAME"
+    ],
+    [
+      3,
+      30,
+      0,
+      40,
+      0,
+      "GAP_SEGMENT"
+    ],
+    [
+      4,
+      30,
+      1,
+      80,
+      0,
+      "STRING"
+    ],
+    [
+      5,
+      11,
+      0,
+      21,
+      0,
+      "IMAGE"
+    ],
+    [
+      6,
+      21,
+      0,
+      31,
+      0,
+      "GAP_KEYFRAME"
+    ],
+    [
+      7,
+      31,
+      0,
+      40,
+      1,
+      "GAP_SEGMENT"
+    ],
+    [
+      8,
+      31,
+      1,
+      81,
+      0,
+      "STRING"
+    ],
+    [
+      9,
+      12,
+      0,
+      22,
+      0,
+      "IMAGE"
+    ],
+    [
+      10,
+      22,
+      0,
+      32,
+      0,
+      "GAP_KEYFRAME"
+    ],
+    [
+      11,
+      32,
+      0,
+      40,
+      2,
+      "GAP_SEGMENT"
+    ],
+    [
+      12,
+      32,
+      1,
+      82,
+      0,
+      "STRING"
+    ],
+    [
+      13,
+      13,
+      0,
+      23,
+      0,
+      "IMAGE"
+    ],
+    [
+      14,
+      23,
+      0,
+      33,
+      0,
+      "GAP_KEYFRAME"
+    ],
+    [
+      15,
+      33,
+      0,
+      40,
+      3,
+      "GAP_SEGMENT"
+    ],
+    [
+      16,
+      33,
+      1,
+      83,
+      0,
+      "STRING"
+    ],
+    [
+      17,
+      70,
+      0,
+      40,
+      6,
+      "AUDIO"
+    ],
+    [
+      18,
+      40,
+      0,
+      50,
+      0,
+      "VIDEO"
+    ],
+    [
+      19,
+      40,
+      4,
+      60,
+      0,
+      "STRING"
+    ],
+    [
+      20,
+      40,
+      5,
+      61,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "1. Keyframes - image + what happens there",
+      "bounding": [
+        -1700,
+        -320,
+        800,
+        2060
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "2. Segment Generators - prompt + length",
+      "bounding": [
+        -880,
+        -320,
+        440,
+        2060
+      ],
+      "color": "#a15c38",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "3. Prompt written for each keyframe",
+      "bounding": [
+        -440,
+        -320,
+        460,
+        2060
+      ],
+      "color": "#7a529e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "4. Segment Manager - the chain",
+      "bounding": [
+        100,
+        -320,
+        500,
+        980
+      ],
+      "color": "#a15c38",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "5. Output & exact prompts",
+      "bounding": [
+        620,
+        -320,
+        560,
+        1620
+      ],
+      "color": "#3a8757",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "definitions": {
+    "subgraphs": []
+  },
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.5,
+      "offset": [
+        2300,
+        420
+      ]
+    }
+  },
+  "version": 0.4
+}

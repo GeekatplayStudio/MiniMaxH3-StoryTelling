@@ -1,0 +1,24 @@
+[project]
+name = "comfyui-geekatplay-storyteller"
+description = "Story-to-video and keyframe-chain video for MiniMax FastH3 Lite: Ollama AI director, locked character and style consistency, first/last frame segment chaining, batch rendering and music mixing."
+version = "1.6.0"
+authors = [
+    { name = "Vladimir Chopine (Geekatplay Studio)", email = "info@geekatplay.com" }
+]
+dependencies = [
+    "torch",
+    "torchaudio",
+]
+
+# Optional, lipsync only: faster-whisper gives real word boundaries for the splitter.
+# Without it the splitter falls back to energy-based silence detection.
+[project.optional-dependencies]
+lipsync = ["faster-whisper"]
+
+[project.urls]
+Homepage = "https://github.com/GeekatplayStudio/MiniMaxH3-StoryTelling"
+
+[tool.comfy]
+PublisherId = "geekatplay"
+DisplayName = "ComfyUI-Geekatplay-StoryTeller"
+Icon = ""

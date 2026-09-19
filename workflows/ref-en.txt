@@ -1,0 +1,38 @@
+MiniMax H3 / FastH3 - REFERENCE (SUBJECT CONSISTENCY) PROMPT GUIDE
+Geekatplay Studio distillation of the official MiniMax H3 reference prompting rules.
+Drop the official ref-en.txt here to override this file.
+
+1. SUBJECT TAGS
+Every recurring character, creature, vehicle or prop gets a numbered tag:
+   <Subject 1>, <Subject 2>, <Subject 3> ...
+Tags are assigned once, in a Character Bible, and never renumbered mid-story.
+
+2. CHARACTER BIBLE ENTRY
+One entry per subject, written as a single descriptive clause that repeats verbatim
+in every segment where the subject appears:
+   <Subject 1>: Dr. Maya Vance, a woman in her late twenties, braided auburn hair,
+   beige utility jumpsuit with rolled sleeves, amber safety visor pushed up on her forehead.
+Lock: age, build, hair, face, clothing, colours, accessories. Do not restyle between shots.
+Lighting, expression, pose and camera distance are free to change; identity is not.
+
+3. USING TAGS IN A SHOT
+First mention in a shot carries the full description, later mentions use the tag alone:
+   "[Shot 1] <Subject 1> Dr. Maya Vance, braided auburn hair and beige utility jumpsuit,
+   kneels beside the glowing seed tray... <Subject 2> hovers just above her shoulder."
+
+4. VOICE IDENTITY
+Each speaking subject gets a stable speaker tag: (S1), (S2), ...
+The tag binds to the subject for the whole story so the voice does not change between segments:
+   "<Subject 1> (S1) says: <d>[English] It is still warm.</d>"
+Describe the voice once in the bible (pitch, age, accent, delivery) and never contradict it.
+
+5. CONTINUITY BETWEEN SEGMENTS
+- Carry the environment forward: same location, time of day and weather unless the story cuts away.
+- End a segment on a stable pose and start the next one from that pose.
+- Keep props in the hand or place they ended in.
+- Re-state the style clause ("cinematic live-action, anamorphic, warm key light") in every segment.
+
+6. REFERENCE MEDIA
+When reference images or videos are supplied, map them to the same tags
+(ref_image_1 -> <Subject 1>) and keep the mapping stable for the whole story.
+Reference frames must be at least 5 frames long and are resized to the 32 px canvas grid.
